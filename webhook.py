@@ -2,29 +2,26 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-VERIFY_TOKEN = "your_verify_token"  # You can choose any secure string
+VERIFY_TOKEN = 'myverifytoken123'
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
-    if request.method == "GET":
-        # Verification
-        mode = request.args.get("hub.mode")
-        token = request.args.get("hub.verify_token")
-        challenge = request.args.get("hub.challenge")
+    if request.method == 'GET':
+        # Meta verification
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        mode = request.args.get('hub.mode')
 
-        if mode == "subscribe" and token == VERIFY_TOKEN:
-            print("WEBHOOK VERIFIED")
+        if token == VERIFY_TOKEN and mode == 'subscribe':
             return challenge, 200
         else:
-            return "Verification token mismatch", 403
+            return 'Verification token mismatch', 403
 
-    elif request.method == "POST":
-        # Message received from WhatsApp
-        data = request.json
-        print("Received message:", data)
-        return "EVENT_RECEIVED", 200
+    elif request.method == 'POST':
+        # Handle incoming messages here
+        data = request.get_json()
+        print("Webhook received:", data)
+        return 'EVENT_RECEIVED', 200
 
-    return "Hello from webhook", 200
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050)
+if __name__ == '__main__':
+    app.run(port=5000)
