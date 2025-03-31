@@ -2,15 +2,13 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
+# This token MUST match exactly with the one you enter in Meta dashboard
 VERIFY_TOKEN = 'myverifytoken123'
-
-@app.route('/')
-def index():
-    return 'WhatsApp Webhook Server Running', 200
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
+        # Verification from Meta
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
         mode = request.args.get('hub.mode')
@@ -21,8 +19,9 @@ def webhook():
             return 'Verification token mismatch', 403
 
     elif request.method == 'POST':
+        # Handle actual WhatsApp messages
         data = request.get_json()
-        print("Webhook received:", data)
+        print("Webhook received data:", data)
         return 'EVENT_RECEIVED', 200
 
 if __name__ == '__main__':
